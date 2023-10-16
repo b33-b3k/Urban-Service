@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vendor_app/screens/servicesPage.dart';
 import 'package:vendor_app/screens/vendorScreen.dart';
 
+//main screen of the app homescreen where services are displayed
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
