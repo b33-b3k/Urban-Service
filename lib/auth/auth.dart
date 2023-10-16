@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-// Replace these URLs with your own backend server endpoints
+//api endpoints sample
 const String loginUrl = 'https://your-backend-api.com/login';
 const String signupUrl = 'https://your-backend-api.com/signup';
 const String logoutUrl = 'your_logout_url_here'; // Replace with your logout URL
