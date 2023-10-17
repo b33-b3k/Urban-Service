@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
                 // Add about logic here
               },
             ),
-            const Divider(),
+            const Divider(),//a simpler line divider
           ],
         ),
       ),
