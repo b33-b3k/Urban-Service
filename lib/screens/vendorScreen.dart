@@ -46,80 +46,66 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Become a Vendor'),
+        backgroundColor: Colors.blueGrey, // Professional look
       ),
-      body: Form(
-        key: _formKey,
+      body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _businessNameController,
-                decoration: InputDecoration(labelText: 'Business Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your business name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(labelText: 'Address'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your address';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _panController,
-                decoration: InputDecoration(labelText: 'PAN Number'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your PAN number';
-                  }
-                  return null;
-                },
-              ),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Submit'),
-              ),
-            ],
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildTextField(
+                    _nameController, 'Name', 'Please enter your name'),
+                _buildTextField(
+                    _emailController, 'Email', 'Please enter your email',
+                    keyboardType: TextInputType.emailAddress),
+                _buildTextField(_businessNameController, 'Business Name',
+                    'Please enter your business name'),
+                _buildTextField(
+                    _addressController, 'Address', 'Please enter your address'),
+                _buildTextField(
+                    _phoneController, 'Phone', 'Please enter your phone number',
+                    keyboardType: TextInputType.phone),
+                _buildTextField(_panController, 'PAN Number',
+                    'Please enter your PAN number'),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  child: Text('Submit'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blueGrey,
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, String validationMessage,
+      {TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return validationMessage;
+          }
+          return null;
+        },
+        keyboardType: keyboardType,
       ),
     );
   }
