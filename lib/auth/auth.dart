@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:vendor_app/screens/registerScreen.dart';
+// import 'package:vendor_app/screens/registerScreen.dart';
 
 //api endpoints sample
 const String loginUrl = 'https://your-backend-api.com/login';

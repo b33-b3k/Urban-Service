@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vendor_app/auth/auth.dart';
+// import 'package:vendor_app/auth/auth.dart';
 import 'package:vendor_app/screens/homeScreen.dart';
-import 'package:vendor_app/screens/registerScreen.dart';
+// import 'package:vendor_app/screens/registerScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AuthenticationScreen(),
+      home: HomeScreen(),
     );
   }
 }
