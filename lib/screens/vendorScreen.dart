@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:vendor_app/auth/auth.dart';
+
+const String vendorUrl = 'http://localhost:8000/api/v1/user/vendor';
 
 class VendorFormScreen extends StatefulWidget {
   @override
@@ -15,29 +20,56 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
 
-  void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      //! If the form is valid, send the data to the API
-      final url = Uri.parse('YOUR_API_ENDPOINT_URL');
-      final response = await http.post(
-        url,
-        body: {
-          'name': _nameController.text,
-          'email': _emailController.text,
-          'businessName': _businessNameController.text,
-          'address': _addressController.text,
-          'phone': _phoneController.text,
-          'pan': _panController.text,
-        },
+  Future<String?> getUserIdByEmail(String email) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://localhost:8000/api/v1/auth/getUserId?email=beebek2004@gmail.com'),
+        // 'http://localhost:8000/api/v1/getUserId?email=${emailController.text}'),
       );
 
       if (response.statusCode == 200) {
-        // If the API call is successful, handle the response here
-        print('Form data sent successfully');
+        var data = json.decode(response.body);
+        return data['userId'];
+        print(data['userId']);
       } else {
-        // If the API call fails, handle the error here
-        print('Failed to send form data');
+        print('Failed to load user ID');
+        return null;
       }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<void> requestVendor() async {
+    try {
+      String? userId = await getUserIdByEmail('beebek2004@gmail.com');
+      Map<String, dynamic> createVendorRequestData(String userId) {
+        return {
+          'user': userId,
+        };
+      }
+
+      var requestData = createVendorRequestData(userId!);
+
+      var response = await http.post(
+        Uri.parse(vendorUrl),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(requestData), // Sending as a JSON object
+      );
+
+      if (response.statusCode == 200) {
+        // Handle successful response
+        var data = json.decode(response.body);
+        print('Success: ${data['msg']}');
+      } else {
+// Handle error
+        print('Error: ${response.body}');
+      }
+    } catch (e) {
+// Handle network error or other exceptions
+      print('Exception: $e');
     }
   }
 
@@ -45,12 +77,12 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Become a Vendor'),
-        backgroundColor: Colors.blueGrey, // Professional look
+        title: const Text('Become a Vendor'),
+        backgroundColor: Colors.greenAccent, // Professional look
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -69,13 +101,14 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
                     keyboardType: TextInputType.phone),
                 _buildTextField(_panController, 'PAN Number',
                     'Please enter your PAN number'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _submitForm,
-                  child: Text('Submit'),
+                  onPressed: () => requestVendor(),
+                  child: const Text('Submit'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blueGrey,
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    primary: Colors.greenAccent,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 15),
                   ),
                 ),
               ],
@@ -95,7 +128,7 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           fillColor: Colors.grey[200],
           filled: true,
         ),

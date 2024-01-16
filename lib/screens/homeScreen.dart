@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendor_app/auth/auth.dart';
 import 'package:vendor_app/screens/servicesPage.dart';
 import 'package:vendor_app/screens/vendorScreen.dart';
 
@@ -8,7 +9,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Urban Services'),
-        backgroundColor: Colors.deepPurple, // Consistent theme color
+        backgroundColor: Colors.greenAccent, // Consistent theme color
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -21,16 +22,16 @@ class HomeScreen extends StatelessWidget {
       drawer: Theme(
         // Enhanced drawer style
         data: Theme.of(context).copyWith(
-          canvasColor: Colors.white, // Changes drawer background color
+          canvasColor: Colors.greenAccent, // Changes drawer background color
         ),
         child: Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const UserAccountsDrawerHeader(
+              UserAccountsDrawerHeader(
                 // Improved header with user account details
-                accountName: Text("Username"),
-                accountEmail: Text("user@example.com"),
+                accountName: Text(username.text),
+                accountEmail: Text(emailController.text),
                 currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Text(
@@ -56,7 +57,10 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.exit_to_app,
                 text: 'Logout',
                 onTap: () {
-                  // Add logout logic here
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AuthenticationScreen()));
                 },
               ),
             ],

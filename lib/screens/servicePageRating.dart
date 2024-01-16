@@ -3,9 +3,17 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ServiceDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> service;
-
-  const ServiceDetailsPage({Key? key, required this.service}) : super(key: key);
+  final String title;
+  final String description;
+  final String photo;
+  final String category;
+  const ServiceDetailsPage({
+    Key? key,
+    required this.title,
+    required this.description,
+    required this.photo,
+    required this.category,
+  }) : super(key: key);
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -23,7 +31,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
 
   Future<void> loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
-    final serviceKey = widget.service['title']; // Unique key for each service
+    final serviceKey = widget.title; // Unique key for each service
 
     setState(() {
       reviews = prefs.getStringList('${serviceKey}_reviews') ?? [];
@@ -33,7 +41,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
 
   Future<void> saveData() async {
     final prefs = await SharedPreferences.getInstance();
-    final serviceKey = widget.service['title']; // Unique key for each service
+    final serviceKey = widget.title; // Unique key for each service
 
     prefs.setStringList('${serviceKey}_reviews', reviews);
     prefs.setDouble('${serviceKey}_rating', rating);
@@ -43,8 +51,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.service['title']),
-        backgroundColor: Colors.blueGrey, // Example color
+        title: Text(widget.title),
+        backgroundColor: Colors.greenAccent, // Example color
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -73,14 +81,14 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
 
   Widget buildServiceTitle() {
     return Text(
-      widget.service['title'],
+      widget.title,
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
   }
 
   Widget buildServiceImage() {
     return Image.network(
-      widget.service['image'],
+      widget.photo,
       height: 200,
       width: double.infinity,
       fit: BoxFit.cover,
@@ -95,7 +103,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
 
   Widget buildServiceDescription() {
     return Text(
-      widget.service['description'],
+      widget.description,
       style: TextStyle(fontSize: 16, color: Colors.grey[600]),
     );
   }
@@ -158,7 +166,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
             itemBuilder: (BuildContext context, int index) {
               return Card(
                 child: ListTile(
-                  leading: const Icon(Icons.person, color: Colors.blueGrey),
+                  leading: const Icon(Icons.person, color: Colors.deepPurple),
                   title: Text(reviews[index]),
                 ),
               );

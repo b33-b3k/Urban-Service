@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:vendor_app/auth/auth.dart';
+import 'package:vendor_app/auth/auth.dart';
 import 'package:vendor_app/screens/homeScreen.dart';
+// import 'package:vendor_app/auth/auth.dart';
 // import 'package:vendor_app/screens/registerScreen.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.greenAccent),
         useMaterial3: true,
       ),
       home: HomeScreen(),

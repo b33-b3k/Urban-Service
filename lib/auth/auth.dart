@@ -1,16 +1,43 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:vendor_app/screens/homeScreen.dart';
+
 // import 'package:vendor_app/screens/registerScreen.dart';
+final TextEditingController emailController = TextEditingController();
+final TextEditingController username = TextEditingController();
 
 //api endpoints sample
-const String loginUrl = 'https://your-backend-api.com/login';
-const String signupUrl = 'https://your-backend-api.com/signup';
-const String logoutUrl = 'your_logout_url_here'; // Replace with your logout URL
+const String loginUrl = 'http://localhost:8000/api/v1/auth/login';
+const String signupUrl = 'http://localhost:8000/api/v1/auth/';
+const String logoutUrl = 'http://localhost:8000/api/v1/auth/logout';
+const String forgotPassword = 'http://localhost:8000/api/v1/auth/forgot';
+
+void showErrorDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
 Future<String> loginUser(String email, String password) async {
   final response = await http.post(Uri.parse(loginUrl), body: {
-    'email': email,
+    'emailorusername': email,
     'password': password,
   });
 
@@ -23,48 +50,40 @@ Future<String> loginUser(String email, String password) async {
   }
 }
 
-Future<String> signupUser(String email, String password) async {
-  final response = await http.post(Uri.parse(signupUrl), body: {
-    'email': email,
-    'password': password,
-  });
-
-  if (response.statusCode == 200) {
-    // If the server returns a 200 OK response, return the user token
-    return json.decode(response.body)['token'];
-  } else {
-    // If the server did not return a 200 OK response, throw an exception.
-    throw Exception('Failed to signup');
-  }
-}
-
-Future<void> logoutUser(String token) async {
-  final response = await http.post(
-    Uri.parse(logoutUrl),
-    headers: {'Authorization': 'Bearer $token'},
-  );
-
-  if (response.statusCode == 200) {
-    // If the server returns a 200 OK response, the user is successfully logged out
-    print('User logged out successfully');
-  } else {
-    // If the server did not return a 200 OK response, throw an exception.
-    throw Exception('Failed to log out');
-  }
-}
-
 class AuthenticationScreen extends StatelessWidget {
+  const AuthenticationScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    Future<void> logoutUser(String token) async {
+      final response = await http.post(
+        Uri.parse(logoutUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, the user is successfully logged out
+        print('User logged out successfully');
+        //navigate to authenticate screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AuthenticationScreen()),
+        );
+      } else {
+        // If the server did not return a 200 OK response, throw an exception.
+        throw Exception('Failed to log out');
+      }
+    }
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-                "asset/images/auth.png"), // Replace with your own image
-            fit: BoxFit.cover,
-          ),
-        ),
+        // decoration: BoxDecoration(
+        //   image: DecorationImage(
+        //     image: AssetImage(
+        //         "asset/images/auth.png"), // Replace with your own image
+        //     fit: BoxFit.cover,
+        //   ),
+        // ),
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -80,17 +99,53 @@ class AuthenticationScreen extends StatelessWidget {
               ),
               Column(
                 children: [
-                  _buildInputField(icon: Icons.mail_outline, hint: 'Email'),
-                  SizedBox(height: 10),
-                  _buildInputField(
-                      icon: Icons.lock_outline,
-                      hint: 'Password',
-                      isPassword: true),
-                  SizedBox(height: 20),
-                  _buildButton(context, 'Log In', Colors.black, Colors.white),
-                  SizedBox(height: 20),
-                  _buildButton(context, 'Sign Up', Colors.white, Colors.black),
-                  SizedBox(height: 40),
+                  //     _buildInputField(icon: Icons.mail_outline, hint: 'Email'),
+                  //     const SizedBox(height: 10),
+                  //     _buildInputField(
+                  //         icon: Icons.lock_outline,
+                  //         hint: 'Password',
+                  //         isPassword: true),
+                  //     const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      //navigate to login
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 130, vertical: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text("Signup",
+                        style: TextStyle(color: Colors.black)),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 130, vertical: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text("Login",
+                        style: TextStyle(color: Colors.black)),
+                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ],
@@ -103,7 +158,7 @@ class AuthenticationScreen extends StatelessWidget {
   Widget _buildInputField(
       {required IconData icon, required String hint, bool isPassword = false}) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -114,24 +169,8 @@ class AuthenticationScreen extends StatelessWidget {
           prefixIcon: Icon(icon, color: Colors.black),
           hintText: hint,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButton(
-      BuildContext context, String text, Color bgColor, Color textColor) {
-    return ElevatedButton(
-      onPressed: () {
-        // Implement navigation logic
-      },
-      child: Text(text, style: TextStyle(color: textColor)),
-      style: ElevatedButton.styleFrom(
-        primary: bgColor,
-        padding: EdgeInsets.symmetric(horizontal: 130, vertical: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
       ),
     );
@@ -139,41 +178,58 @@ class AuthenticationScreen extends StatelessWidget {
 }
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
-        Uri.parse('YOUR_API_ENDPOINT'), // Replace with your API endpoint
+        Uri.parse(
+            'http://localhost:8000/api/v1/auth/login'), // Replace with your API endpoint
         body: {
-          'email': _emailController.text,
+          'emailorusername': emailController.text,
           'password': _passwordController.text,
         },
       );
 
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+      print(response);
+
       if (response.statusCode == 200) {
         // Handle the response, e.g., navigate to another screen
         print('Login successful');
+        //navigate to homescreen
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       } else {
         // Handle errors
         print('Failed to log in');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${response.body}'),
+          ),
+        );
       }
     }
   }
 
   Widget _buildTextField({required String label, required bool isPassword}) {
     return TextFormField(
-      controller: isPassword ? _passwordController : _emailController,
+      controller: isPassword ? _passwordController : emailController,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       obscureText: isPassword,
       validator: (value) {
@@ -188,24 +244,24 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginButton(BuildContext context) {
     return ElevatedButton(
       onPressed: _login,
-      child: const Text(
-        'Login',
-        style: TextStyle(color: Colors.white),
-      ),
       style: ElevatedButton.styleFrom(
-        primary: Colors.deepPurple,
-        padding: EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: Colors.greenAccent,
+        padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+      ),
+      child: const Text(
+        'Login',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
 
   Widget _buildLogo() {
-    return Center(
+    return const Center(
       // Add your logo here
-      child: Icon(Icons.account_circle, size: 100, color: Colors.deepPurple),
+      child: Icon(Icons.account_circle, size: 100, color: Colors.greenAccent),
     );
   }
 
@@ -217,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'Login',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.greenAccent,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -240,11 +296,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpScreen()),
                     );
                   },
                   child: const Text(
                     "Don't have an account? Sign up",
+                    style: TextStyle(color: Colors.purple),
+                  ),
+                ),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen()),
+                    );
+                  },
+                  child: const Text(
+                    "Forgot Password",
                     style: TextStyle(color: Colors.purple),
                   ),
                 ),
@@ -270,6 +341,8 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -277,34 +350,20 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController address = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      final response = await http.post(
-        Uri.parse('YOUR_API_ENDPOINT'), // Replace with your API endpoint
-        body: {
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Handle the response, e.g., navigate to another screen
-        print('Login successful');
-      } else {
-        // Handle errors
-        print('Failed to log in');
-      }
-    }
-  }
-
-  Widget _buildTextField({required String label, required bool isPassword}) {
+  Widget _buildTextField(
+      {required String label,
+      required TextEditingController controller,
+      required bool isPassword}) {
     return TextFormField(
-      controller: isPassword ? _passwordController : _emailController,
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       obscureText: isPassword,
       validator: (value) {
@@ -316,27 +375,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  Future<String> signupUser(
+      String email, String password, String address, String username) async {
+    final response = await http.post(
+      Uri.parse(signupUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'email': email,
+        'username': username,
+        'password': password,
+        'address': address,
+      }),
+    );
+
+    print("Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+    print(response);
+
+    if (response.statusCode == 200) {
+      // Handle successful registration
+      return json.decode(response.body)['token'];
+    } else {
+      // Handle different statuses and error responses
+      throw Exception('Failed to signup: ${response.body}');
+    }
+  }
+
   Widget _buildLoginButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: _login,
-      child: const Text(
-        'Register',
-        style: TextStyle(color: Colors.white),
-      ),
+      onPressed: () => signupUser(_emailController.text,
+          _passwordController.text, address.text, username.text),
       style: ElevatedButton.styleFrom(
-        primary: Colors.deepPurple,
-        padding: EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: Colors.greenAccent,
+        padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+      ),
+      child: const Text(
+        'Register',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
 
   Widget _buildLogo() {
-    return Center(
+    return const Center(
       // Add your logo here
-      child: Icon(Icons.account_circle, size: 100, color: Colors.deepPurple),
+      child: Icon(Icons.account_circle, size: 100, color: Colors.greenAccent),
     );
   }
 
@@ -348,7 +434,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'Register',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.greenAccent,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -362,9 +448,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                 _buildLogo(),
                 const SizedBox(height: 30),
-                _buildTextField(label: 'Email', isPassword: false),
+                _buildTextField(
+                    label: 'Username', isPassword: false, controller: username),
                 const SizedBox(height: 20),
-                _buildTextField(label: 'Password', isPassword: true),
+                _buildTextField(
+                    label: 'Address', isPassword: false, controller: address),
+                const SizedBox(height: 20),
+                _buildTextField(
+                    label: 'Email',
+                    isPassword: false,
+                    controller: _emailController),
+                const SizedBox(height: 20),
+                _buildTextField(
+                    label: 'Password',
+                    isPassword: true,
+                    controller: _passwordController),
                 const SizedBox(height: 30),
 
                 //if registered login
@@ -372,7 +470,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
                     );
                   },
                   child: const Text(
@@ -391,8 +490,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final TextEditingController _emailController = TextEditingController();
+
+  Future<void> requestResetPassword(String email) async {
+    // Call API to request password reset
+    final response = await http.post(
+      Uri.parse(forgotPassword),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'email': email}),
+    );
+    //print response
+    print(email);
+    print("Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      // Handle success, maybe show a success message
+      final responseBody = jsonDecode(response.body);
+
+      String resetToken = responseBody['resetToken'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Reset link sent, please check your email.'),
+        ),
+      );
+      print('Reset link sent, please check your email.');
+    } else {
+      // Handle error, show an error message
+      throw Exception('Failed to request password reset.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +537,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           'Reset Password',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurple, // Consistent theme color
+        backgroundColor: Colors.greenAccent, // Consistent theme color
       ),
       body: SingleChildScrollView(
         // Ensures form is scrollable on smaller devices
@@ -412,11 +547,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _buildPasswordInputField(label: 'Current Password'),
-              const SizedBox(height: 20),
-              _buildPasswordInputField(label: 'New Password'),
-              const SizedBox(height: 20),
-              _buildPasswordInputField(label: 'Confirm New Password'),
+              _buildPasswordInputField(label: 'Enter your email'),
               const SizedBox(height: 30),
               _buildResetPasswordButton(context),
             ],
@@ -436,22 +567,23 @@ class ForgotPasswordScreen extends StatelessWidget {
         fillColor: Colors.grey[200],
         filled: true,
       ),
-      obscureText: true,
+      obscureText: false,
+      controller: _emailController,
     );
   }
 
   Widget _buildResetPasswordButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Implement password reset logic here
+        requestResetPassword(_emailController.text);
       },
       child: const Text(
         'Reset Password',
         style: TextStyle(color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(
-        primary: Colors.deepPurple,
-        padding: EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: Colors.greenAccent,
+        padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -459,3 +591,93 @@ class ForgotPasswordScreen extends StatelessWidget {
     );
   }
 }
+
+// class ResetPasswordScreen extends StatefulWidget {
+//   const ResetPasswordScreen({super.key});
+
+//   @override
+//   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+// }
+
+// class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+//   final TextEditingController _passwordController = TextEditingController();
+//   final TextEditingController _re_enter_passwordController =
+//       TextEditingController();
+
+//   final TextEditingController _tokenController = TextEditingController();
+
+//   Future<void> requestResetPassword(String email) async {
+//     // Call API to request password reset
+//     final response = await http.post(
+//       Uri.parse(forgotPassword),
+//       headers: {"Content-Type": "application/json"},
+//       body: jsonEncode({'email': email}),
+//     );
+//     //print response
+//     print(email);
+//     print("Status Code: ${response.statusCode}");
+//     print("Response Body: ${response.body}");
+
+//     if (response.statusCode == 200) {
+//       // Handle success, maybe show a success message
+//       final responseBody = jsonDecode(response.body);
+
+//       String resetToken = responseBody['resetToken'];
+//       _tokenController.text = resetToken;
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Reset link sent, please check your email.'),
+//         ),
+//       );
+//     } else {
+//       // Handle error, show an error message
+//       throw Exception('Failed to request password reset.');
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Reset Password'),
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: <Widget>[
+//             const SizedBox(height: 20),
+//             TextFormField(
+//               controller: _passwordController,
+//               decoration: const InputDecoration(
+//                 labelText: 'New Password',
+//                 border: OutlineInputBorder(),
+//               ),
+//               obscureText: true,
+//             ),
+//             const SizedBox(height: 20),
+//             TextFormField(
+//               controller: _re_enter_passwordController,
+//               decoration: const InputDecoration(
+//                 labelText: 'Re-enter your Password',
+//                 border: OutlineInputBorder(),
+//               ),
+//               obscureText: true,
+//             ),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () => requestResetPassword(_passwordController.text),
+//               child: const Text('Reset Password'),
+//               style: ElevatedButton.styleFrom(
+//                 primary: Theme.of(context).primaryColor,
+//                 padding: const EdgeInsets.symmetric(vertical: 15),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
