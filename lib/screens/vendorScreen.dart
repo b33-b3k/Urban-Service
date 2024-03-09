@@ -106,7 +106,7 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
                   onPressed: () => requestVendor(),
                   child: const Text('Submit'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.greenAccent,
+                    backgroundColor: Colors.greenAccent,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 50, vertical: 15),
                   ),

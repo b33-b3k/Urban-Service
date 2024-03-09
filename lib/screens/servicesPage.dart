@@ -96,7 +96,7 @@ class _ServicePageState extends State<ServicePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Container(
                       height: 150,
