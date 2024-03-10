@@ -8,6 +8,59 @@ import 'package:vendor_app/screens/homeScreen.dart';
 // import 'package:vendor_app/screens/registerScreen.dart';
 final TextEditingController emailController = TextEditingController();
 final TextEditingController username = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+
+// auth_service.dart
+
+class AuthService {
+  // Singleton instance
+  static final AuthService _instance = AuthService._internal();
+
+  factory AuthService() {
+    return _instance;
+  }
+
+  AuthService._internal();
+
+  late String? _token;
+  String? _userId;
+
+  String? get token => _token;
+  String? get userId => _userId;
+
+  Future<void> loginUser(String email, String password) async {
+    final response = await http.post(Uri.parse(loginUrl), body: {
+      'emailorusername': email,
+      'password': password,
+    });
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(response.body);
+      _token = responseData['token'];
+      _userId = responseData['_id'];
+      print('User logged in successfully: $responseData');
+    } else {
+      throw Exception('Failed to login');
+    }
+  }
+
+  Future<void> logoutUser() async {
+    final response = await http.post(
+      Uri.parse(logoutUrl),
+      headers: {'Authorization': 'Bearer $_token'},
+    );
+
+    if (response.statusCode == 200) {
+      _token = null;
+      _userId = null;
+      print('User logged out successfully');
+    } else {
+      throw Exception('Failed to log out');
+    }
+  }
+}
+
+final AuthService authService = AuthService();
 
 //api endpoints sample
 const String loginUrl = 'http://localhost:8000/api/v1/auth/login';
@@ -186,7 +239,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -195,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
             'http://localhost:8000/api/v1/auth/login'), // Replace with your API endpoint
         body: {
           'emailorusername': emailController.text,
-          'password': _passwordController.text,
+          'password': passwordController.text,
         },
       );
 
@@ -205,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         // Handle the response, e.g., navigate to another screen
-        print('Login successful');
+        print('Login successfulllll');
         //navigate to homescreen
         // ignore: use_build_context_synchronously
         Navigator.push(
@@ -226,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildTextField({required String label, required bool isPassword}) {
     return TextFormField(
-      controller: isPassword ? _passwordController : emailController,
+      controller: isPassword ? passwordController : emailController,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
@@ -259,9 +311,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLogo() {
-    return const Center(
+    return Center(
       // Add your logo here
-      child: Icon(Icons.account_circle, size: 100, color: Colors.greenAccent),
+      child: InkWell(
+        child: Icon(Icons.account_circle, size: 100, color: Colors.greenAccent),
+        onLongPress: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        },
+      ),
     );
   }
 

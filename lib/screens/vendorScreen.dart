@@ -24,14 +24,14 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://localhost:8000/api/v1/auth/getUserId?email=beebek2004@gmail.com'),
-        // 'http://localhost:8000/api/v1/getUserId?email=${emailController.text}'),
+            // 'http://localhost:8000/api/v1/auth/getUserId?email=beebek2004@gmail.com'),
+            'http://localhost:8000/api/v1/auth/getUserId?email=${emailController.text}'),
       );
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        return data['userId'];
         print(data['userId']);
+        return data['userId'];
       } else {
         print('Failed to load user ID');
         return null;
@@ -44,7 +44,7 @@ class _VendorFormScreenState extends State<VendorFormScreen> {
 
   Future<void> requestVendor() async {
     try {
-      String? userId = await getUserIdByEmail('beebek2004@gmail.com');
+      String? userId = await getUserIdByEmail(_emailController.text);
       Map<String, dynamic> createVendorRequestData(String userId) {
         return {
           'user': userId,

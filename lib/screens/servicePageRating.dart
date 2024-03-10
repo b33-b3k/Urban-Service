@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+//http
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:vendor_app/screens/formPage.dart';
 
 class ServiceDetailsPage extends StatefulWidget {
+  final String id;
   final String title;
   final String description;
   final String photo;
@@ -13,6 +19,7 @@ class ServiceDetailsPage extends StatefulWidget {
     required this.description,
     required this.photo,
     required this.category,
+    required this.id,
   }) : super(key: key);
 
   @override
@@ -73,9 +80,58 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage> {
             buildReviewsHeader(),
             const SizedBox(height: 10),
             buildReviewsList(),
+            const SizedBox(height: 10),
+            buildBookingButton(),
           ],
         ),
       ),
+    );
+  }
+
+  void showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Booking Successful'),
+          content: Text('You have successfully booked ${widget.title}!'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'OK',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildBookingButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Simulate a successful booking response from the backend
+        // Replace this with actual backend integration logic
+        // For demonstration purposes, we'll assume a successful booking after a delay
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => UpKeepFormPage(
+                      serviceId: widget.id,
+                    )));
+        // Future.delayed(Duration(seconds: 2), () {
+        //   showSuccessDialog();
+        // });
+      },
+      child: const Center(
+          child: Text('Book Now',
+              style: TextStyle(
+                  color: Colors.greenAccent,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold))),
     );
   }
 

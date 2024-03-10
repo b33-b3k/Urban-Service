@@ -82,6 +82,7 @@ class _ServicePageState extends State<ServicePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => ServiceDetailsPage(
+                      id: service.id,
                       title: service.title,
                       description: service.description,
                       photo: service.image,
