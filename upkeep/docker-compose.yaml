@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+    mongo:
+        image: mongo
+        container_name: mongo
+        volumes:
+            - data:/data/db
+        restart: unless-stopped
+        ports:
+            - '27017:27017'
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=upkeep
+            - MONGO_INITDB_ROOT_PASSWORD=upkeep
+
+    client:
+        container_name: client
+        image: client:v1
+        build: ./client
+        ports:
+            - '3000:3000'
+        volumes:
+            - ./client/src:/app/src
+        environment:
+            - WATCHPACK_POLLING=true
+        depends_on:
+            - api
+        stdin_open: true
+        tty: true
+
+    api:
+        container_name: api
+        image: api:v1
+        build: ./api
+        ports:
+            - '8000:8000'
+        volumes:
+            - ./api:/app
+            - /app/node_modules
+        environment:
+            - PORT=8000
+            - MONGO_INITDB_ROOT_USERNAME=upkeep
+            - MONGO_INITDB_ROOT_PASSWORD=upkeep
+        depends_on:
+            - mongo
+
+volumes:
+    data:

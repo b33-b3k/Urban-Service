@@ -1,0 +1,63 @@
+
+
+
+
+
+
+           Customer
+
+-Login and register 
+-Customer Profile 
+-Search services
+-View Services
+-Recieve Order Confirmation mail
+-Inform Admin about Delivery of Services from vendor (Notification)
+-Pay Delivery Service Charge to the Vendor
+-Chat with vendor
+
+
+
+
+             Vendor
+
+-Login and register (role will be approved by admin)
+-Initially vendor will be customer (He/she will request to become vendor (Details haru magney -form). The request will be submitted to the admin for review and it later approved after verifying)
+-Vendor profile
+-Add Services
+-The services added by the vendor will be verified from the admin.
+-Vendor Dashboard
+(To see the activities of the system. like services list, order list, chat box with customer)
+-pay comission to the logic
+-Terms and conditions
+
+
+
+         Commission Logic (paper work)
+
+-The Vendor registered to the sytem  should pay 15% comission to the admin.
+
+user type - admin/moderator/account
+
+
+user khalti - 100 (booking amount)
+service complete - trigger - payment 85% - vendor /email
+
+
+-To regulate this among the vendor, agreement paper will be signed. (during registration - terms and condition)
+
+
+          Admin
+
+
+-Separate Login
+-Admin profile 
+-Manage roles of users
+-Verify and approve Vendor 
+-Admin Dashboard
+(To see the activities of the system like Customer list, vendor list, chat box with Vendor)
+
+
+
+
+
+
