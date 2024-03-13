@@ -139,42 +139,40 @@ class _UpKeepFormPageState extends State<UpKeepFormPage> {
   late Map<String, dynamic> userData;
 
   Future<void> postOrderToAPI() async {
-    // TODO: Implement the logic to post data to your Node.js API
-    // You can use http package or any other package for making HTTP requests
-    // Example:
-
-    var response = await http.post(
-      Uri.parse('http://localhost:8000/api/v1/order'),
-      body: {
-        'address': addressController.text,
-        'name': customerNameController.text,
-        'phone': phoneNumberController.text,
-        'serviceId': widget.serviceId,
-        'customerId': userId,
-        'time': deliveryTimeController.text,
-        'userId': userId
-      },
-    );
-    if (response.statusCode == 200) {
-      // Handle successful response
-      var data = json.decode(response.body);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Success: ${data['msg']}')),
+    try {
+      var response = await http.post(
+        Uri.parse('http://localhost:8000/api/v1/order'),
+        body: {
+          'address': addressController.text,
+          'name': customerNameController.text,
+          'phone': phoneNumberController.text,
+          'serviceId': widget.serviceId,
+          'customerId': userId,
+          'time': deliveryTimeController.text,
+          'userId': userId
+        },
       );
-
-      print('Success: ${data['msg']}');
-    } else {
-// Handle error
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Success: ${data['msg']}')),
+        );
+        print('Success: ${data['msg']}');
+      } else {
+        var errorMessage = response.body != null
+            ? json.decode(response.body)['error']
+            : 'Unknown error occurred';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $errorMessage')),
+        );
+        print('Error: $errorMessage');
+      }
+    } catch (error) {
+      // Handle network errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('')),
+        SnackBar(content: Text('Network Error: $error')),
       );
+      print('Network Error: $error');
     }
-
-    // After posting the data, you might want to show a success message or navigate to another screen
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Order placed successfully!')),
-    );
-    Navigator.pop(context);
   }
 }
