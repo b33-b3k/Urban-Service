@@ -104,7 +104,7 @@ Future<String> loginUser(String email, String password) async {
 }
 
 class AuthenticationScreen extends StatelessWidget {
-  const AuthenticationScreen({super.key});
+  const AuthenticationScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -130,13 +130,9 @@ class AuthenticationScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        // decoration: BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage(
-        //         "asset/images/auth.png"), // Replace with your own image
-        //     fit: BoxFit.cover,
-        //   ),
-        // ),
+        decoration: BoxDecoration(
+          color: Colors.greenAccent, // Set the background color to green accent
+        ),
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -152,51 +148,74 @@ class AuthenticationScreen extends StatelessWidget {
               ),
               Column(
                 children: [
-                  //     _buildInputField(icon: Icons.mail_outline, hint: 'Email'),
-                  //     const SizedBox(height: 10),
-                  //     _buildInputField(
-                  //         icon: Icons.lock_outline,
-                  //         hint: 'Password',
-                  //         isPassword: true),
-                  //     const SizedBox(height: 20),
-                  ElevatedButton(
+                  _buildInputField(
+                    icon: Icons.mail_outline,
+                    hint: 'Email',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildInputField(
+                    icon: Icons.lock_outline,
+                    hint: 'Password',
+                    isPassword: true,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
                     onPressed: () {
                       //navigate to login
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SignUpScreen()),
+                          builder: (context) => const SignUpScreen(),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 130, vertical: 20),
+                        horizontal: 130,
+                        vertical: 20,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
+                      backgroundColor: Colors.white,
                     ),
-                    child: const Text("Signup",
-                        style: TextStyle(color: Colors.black)),
+                    icon: const Icon(
+                      Icons.person_add,
+                      color: Colors.black,
+                    ),
+                    label: const Text(
+                      "Signup",
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
+                          builder: (context) => const LoginScreen(),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 130, vertical: 20),
+                        horizontal: 130,
+                        vertical: 20,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
+                      backgroundColor: Colors.white,
                     ),
-                    child: const Text("Login",
-                        style: TextStyle(color: Colors.black)),
+                    icon: const Icon(
+                      Icons.login,
+                      color: Colors.black,
+                    ),
+                    label: const Text(
+                      "Login",
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -208,8 +227,11 @@ class AuthenticationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(
-      {required IconData icon, required String hint, bool isPassword = false}) {
+  Widget _buildInputField({
+    required IconData icon,
+    required String hint,
+    bool isPassword = false,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
@@ -258,8 +280,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         // Handle the response, e.g., navigate to another screen
         print('Login successfulllll');
-        //navigate to homescreen
-        // ignore: use_build_context_synchronously
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User logged in successfully'),
+          ),
+        );
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -314,7 +340,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Center(
       // Add your logo here
       child: InkWell(
-        child: Icon(Icons.account_circle, size: 100, color: Colors.greenAccent),
+        child: const Icon(Icons.account_circle,
+            size: 100, color: Colors.greenAccent),
         onLongPress: () {
           Navigator.push(
             context,
@@ -325,6 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  var obscureText = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -349,7 +377,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
                 _buildTextField(label: 'Email', isPassword: false),
                 const SizedBox(height: 20),
-                _buildTextField(label: 'Password', isPassword: true),
+                TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                    suffixIcon:
+                        // show password icon
+                        IconButton(
+                      icon: obscureText
+                          ? Icon(Icons.visibility_off)
+                          : Icon(Icons.visibility),
+                      onPressed: () {
+                        // change the state of the password field
+                        // ignore: invalid_use_of_protected_member
+                        setState(() {
+                          // ignore: invalid_use_of_protected_member
+                          obscureText = !obscureText;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: obscureText,
+                  // show password icon
+
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 30),
                 //if not registered register
                 TextButton(
@@ -450,14 +508,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     print("Status Code: ${response.statusCode}");
     print("Response Body: ${response.body}");
+    //scaffold
+
     print(response);
 
     if (response.statusCode == 200) {
       // Handle successful registration
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User registered successfully'),
+        ),
+      );
       return json.decode(response.body)['token'];
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.body.toString()),
+        ),
+      );
       // Handle different statuses and error responses
       throw Exception('Failed to signup: ${response.body}');
+      //scaffold
     }
   }
 
@@ -523,6 +594,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     label: 'Password',
                     isPassword: true,
                     controller: _passwordController),
+                const SizedBox(height: 20),
+                _buildTextField(
+                    label: 'Confirm Password',
+                    isPassword: true,
+                    controller: _passwordController),
                 const SizedBox(height: 30),
 
                 //if registered login
@@ -585,6 +661,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       print('Reset link sent, please check your email.');
     } else {
       // Handle error, show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to request password reset.'),
+        ),
+      );
       throw Exception('Failed to request password reset.');
     }
   }

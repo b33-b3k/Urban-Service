@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vendor_app/auth/auth.dart';
+import 'package:vendor_app/screens/profilePage.dart';
 import 'package:vendor_app/screens/servicesPage.dart';
 import 'package:vendor_app/screens/vendorScreen.dart';
 
@@ -8,13 +9,17 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Urban Services'),
+        title: Text('Urban Services'),
         backgroundColor: Colors.greenAccent, // Consistent theme color
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: Icon(
+              Icons.account_circle_rounded,
+              color: Colors.white,
+            ),
             onPressed: () {
-              // Logic for notifications
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()));
             },
           ),
         ],
@@ -35,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                 currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Text(
-                    "U",
+                    username.text.toUpperCase() ?? "user",
                     style: TextStyle(fontSize: 40.0, color: Colors.deepPurple),
                   ),
                 ),
@@ -60,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AuthenticationScreen()));
+                          builder: (context) => const AuthenticationScreen()));
                 },
               ),
             ],
